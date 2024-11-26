@@ -2,43 +2,65 @@ package com.example.mystoryapp.ui.main
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.mystoryapp.AuthViewModelFactory
 import com.example.mystoryapp.databinding.ActivityMainBinding
 import com.example.mystoryapp.di.Injection
 import com.example.mystoryapp.ui.AuthViewModel
 import com.example.mystoryapp.ui.login.LoginActivity
+import com.example.mystoryapp.Result
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var authViewModel: AuthViewModel
+    private lateinit var storyViewModel: StoryViewModel
+    private lateinit var storyAdapter: StoryAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Gunakan Injection untuk mendapatkan repository dan ViewModel
         val repository = Injection.provideRepository(this)
         authViewModel = ViewModelProvider(this, AuthViewModelFactory(repository))[AuthViewModel::class.java]
 
-        // Amati status login pengguna
-        authViewModel.isLoggedIn.observe(this) { isLoggedIn ->
-            if (isLoggedIn) {
-                binding.welcomeMessage.text = "Selamat datang di Aplikasi Story!"
-            } else {
-                navigateToLogin()
+        storyViewModel = ViewModelProvider(this, StoryViewModelFactory(repository))[StoryViewModel::class.java]
+
+        setupRecyclerView()
+
+        storyViewModel.stories.observe(this) { result ->
+            when (result) {
+                is Result.Loading -> showLoading(true)
+                is Result.Success -> {
+                    showLoading(false)
+                    storyAdapter.submitList(result.data)
+                }
+                is Result.Error -> {
+                    showLoading(false)
+                    Toast.makeText(this, result.errorMessage, Toast.LENGTH_SHORT).show()
+                }
             }
         }
 
-        // Tombol logout
+        storyViewModel.fetchStories()
+
         binding.btnLogout.setOnClickListener {
             authViewModel.logout()
-            Toast.makeText(this@MainActivity, "Berhasil logout", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Berhasil logout", Toast.LENGTH_SHORT).show()
             navigateToLogin()
+        }
+    }
+
+    private fun setupRecyclerView() {
+        storyAdapter = StoryAdapter()
+        binding.rvStories.apply {
+            adapter = storyAdapter
+            layoutManager = LinearLayoutManager(this@MainActivity)
         }
     }
 
@@ -47,4 +69,9 @@ class MainActivity : AppCompatActivity() {
         startActivity(intent)
         finish()
     }
+
+    private fun showLoading(isLoading: Boolean) {
+        binding.loadingContainer.visibility = if (isLoading) View.VISIBLE else View.GONE
+    }
 }
+

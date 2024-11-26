@@ -8,11 +8,43 @@ import com.example.mystoryapp.request.SignUpRequest
 import com.example.mystoryapp.retrofit.ApiService
 import kotlinx.coroutines.flow.map
 import com.example.mystoryapp.Result
+import com.example.mystoryapp.response.StoryItem
+import kotlinx.coroutines.flow.firstOrNull
 
 class Repository(
     private val apiService: ApiService,
     private val userPreferences: UserPreferences
 ) {
+
+    suspend fun getUserToken(): String? {
+        return userPreferences.getUserToken().firstOrNull()
+    }
+
+    suspend fun getAllStories(token: String): Result<List<StoryItem>> {
+        return try {
+            val response = apiService.getAllStories("Bearer $token")
+            if (!response.error) {
+                Result.Success(response.listStory ?: emptyList())
+            } else {
+                Result.Error(response.message)
+            }
+        } catch (e: Exception) {
+            Result.Error("Gagal memuat cerita: ${e.message}")
+        }
+    }
+
+    suspend fun getStoryDetail(token: String, storyId: String): Result<StoryItem> {
+        return try {
+            val response = apiService.getStoryDetail("Bearer $token", storyId)
+            if (!response.error && response.story != null) {
+                Result.Success(response.story)
+            } else {
+                Result.Error(response.message)
+            }
+        } catch (e: Exception) {
+            Result.Error("Gagal memuat detail cerita: ${e.message}")
+        }
+    }
 
     fun isLoggedIn(): LiveData<Boolean> {
         return userPreferences.getUserToken()
