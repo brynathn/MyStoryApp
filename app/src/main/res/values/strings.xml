@@ -18,4 +18,10 @@
     <string name="already_have_an_account_login">Already have an account! Login</string>
     <string name="logout">Logout</string>
     <string name="story_name">User Name</string>
+    <string name="button_add">+</string>
+    <string name="gallery">Gallery</string>
+    <string name="camera">Camera</string>
+    <string name="upload_story">Upload Story</string>
+    <string name="write_your_story_description">Write your story description</string>
+    <string name="story_description">Description</string>
 </resources>

@@ -23,4 +23,13 @@
         android:layout_margin="16dp"
         android:text="@string/logout"
         android:textSize="16sp" />
+
+    <Button
+        android:id="@+id/btnAddStory"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="16dp"
+        android:text="@string/button_add"
+        android:textSize="24sp" />
 </FrameLayout>

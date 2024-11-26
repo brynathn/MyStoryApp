@@ -16,7 +16,7 @@
         <ImageView
             android:id="@+id/iv_item_photo"
             android:layout_width="match_parent"
-            android:layout_height="200dp"
+            android:layout_height="300dp"
             android:scaleType="centerCrop" />
 
         <TextView
@@ -27,6 +27,17 @@
             android:textSize="16sp"
             android:textStyle="bold"
             android:text="@string/story_name" />
+
+        <TextView
+            android:id="@+id/tv_item_desc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:textSize="14sp"
+            android:textColor="@android:color/darker_gray"
+            android:maxLines="2"
+            android:ellipsize="end"
+            android:text="@string/story_description" />
 
     </LinearLayout>
 

@@ -13,6 +13,7 @@ import com.example.mystoryapp.di.Injection
 import com.example.mystoryapp.ui.AuthViewModel
 import com.example.mystoryapp.ui.login.LoginActivity
 import com.example.mystoryapp.Result
+import com.example.mystoryapp.ui.add.AddStoryActivity
 
 class MainActivity : AppCompatActivity() {
 
@@ -54,7 +55,22 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this, "Berhasil logout", Toast.LENGTH_SHORT).show()
             navigateToLogin()
         }
+
+        binding.btnAddStory.setOnClickListener {
+            val intent = Intent(this, AddStoryActivity::class.java)
+            startActivity(intent)
+        }
+
     }
+
+    override fun onResume() {
+        super.onResume()
+        if (intent.getBooleanExtra("REFRESH_LIST", false)) {
+            storyViewModel.fetchStories()
+            intent.removeExtra("REFRESH_LIST")
+        }
+    }
+
 
     private fun setupRecyclerView() {
         storyAdapter = StoryAdapter()

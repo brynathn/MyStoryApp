@@ -26,6 +26,7 @@ class StoryAdapter : ListAdapter<StoryItem, StoryAdapter.StoryViewHolder>(DIFF_C
     class StoryViewHolder(private val binding: ItemStoryBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(story: StoryItem) {
             binding.tvItemName.text = story.name
+            binding.tvItemDesc.text = story.description
             Glide.with(binding.root)
                 .load(story.photoUrl)
                 .into(binding.ivItemPhoto)

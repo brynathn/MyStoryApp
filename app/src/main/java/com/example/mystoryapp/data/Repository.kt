@@ -10,6 +10,11 @@ import kotlinx.coroutines.flow.map
 import com.example.mystoryapp.Result
 import com.example.mystoryapp.response.StoryItem
 import kotlinx.coroutines.flow.firstOrNull
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
+import java.io.File
 
 class Repository(
     private val apiService: ApiService,
@@ -45,6 +50,36 @@ class Repository(
             Result.Error("Gagal memuat detail cerita: ${e.message}")
         }
     }
+
+    suspend fun addStory(
+        description: String,
+        imageFile: File,
+        token: String,
+        lat: Float? = null,
+        lon: Float? = null
+    ): Result<Unit> {
+        return try {
+            val requestDescription = description.toRequestBody("text/plain".toMediaTypeOrNull())
+
+            val requestImageFile = imageFile.asRequestBody("image/jpeg".toMediaTypeOrNull())
+            val imageMultipart = MultipartBody.Part.createFormData("photo", imageFile.name, requestImageFile)
+
+            val requestLat = lat?.toString()?.toRequestBody("text/plain".toMediaTypeOrNull())
+            val requestLon = lon?.toString()?.toRequestBody("text/plain".toMediaTypeOrNull())
+
+            val response = apiService.addStory("Bearer $token", requestDescription, imageMultipart, requestLat, requestLon)
+
+            if (!response.error) {
+                Result.Success(Unit)
+            } else {
+                Result.Error(response.message)
+            }
+        } catch (e: Exception) {
+            Result.Error("Gagal menambahkan cerita: ${e.message}")
+        }
+    }
+
+
 
     fun isLoggedIn(): LiveData<Boolean> {
         return userPreferences.getUserToken()

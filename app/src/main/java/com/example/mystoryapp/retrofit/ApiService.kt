@@ -2,6 +2,7 @@ package com.example.mystoryapp.retrofit
 
 import com.example.mystoryapp.request.LoginRequest
 import com.example.mystoryapp.request.SignUpRequest
+import com.example.mystoryapp.response.AddStoryResponse
 import com.example.mystoryapp.response.LoginResponse
 import com.example.mystoryapp.response.SignUpResponse
 import com.example.mystoryapp.response.StoryResponse
@@ -46,7 +47,7 @@ interface ApiService {
         @Part file: MultipartBody.Part,
         @Part("lat") lat: RequestBody? = null,
         @Part("lon") lon: RequestBody? = null
-    ): SignUpResponse
+    ): AddStoryResponse
 }
 
 
