@@ -13,6 +13,7 @@ import com.example.mystoryapp.ui.main.MainActivity
 import com.example.mystoryapp.ui.signup.SignUpActivity
 import com.example.mystoryapp.Result
 import com.example.mystoryapp.di.Injection
+import com.example.mystoryapp.ui.widget.MyStoryWidget
 
 
 class LoginActivity : AppCompatActivity() {
@@ -69,6 +70,7 @@ class LoginActivity : AppCompatActivity() {
                 is Result.Success -> {
                     showLoading(false)
                     Toast.makeText(this, "Login Berhasil!", Toast.LENGTH_SHORT).show()
+                    MyStoryWidget().refreshWidget(this)
                     navigateToMainActivity()
                 }
                 is Result.Error -> {

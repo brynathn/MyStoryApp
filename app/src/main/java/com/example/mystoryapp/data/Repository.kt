@@ -79,8 +79,6 @@ class Repository(
         }
     }
 
-
-
     fun isLoggedIn(): LiveData<Boolean> {
         return userPreferences.getUserToken()
             .map { !it.isNullOrEmpty() }

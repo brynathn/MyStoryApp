@@ -14,6 +14,7 @@ import com.example.mystoryapp.ui.AuthViewModel
 import com.example.mystoryapp.ui.login.LoginActivity
 import com.example.mystoryapp.Result
 import com.example.mystoryapp.ui.add.AddStoryActivity
+import com.example.mystoryapp.ui.widget.MyStoryWidget
 
 class MainActivity : AppCompatActivity() {
 
@@ -53,6 +54,7 @@ class MainActivity : AppCompatActivity() {
         binding.btnLogout.setOnClickListener {
             authViewModel.logout()
             Toast.makeText(this, "Berhasil logout", Toast.LENGTH_SHORT).show()
+            MyStoryWidget().refreshWidget(this)
             navigateToLogin()
         }
 

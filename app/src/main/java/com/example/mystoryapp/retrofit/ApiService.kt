@@ -30,7 +30,7 @@ interface ApiService {
         @Header("Authorization") token: String,
         @Query("page") page: Int? = null,
         @Query("size") size: Int? = null,
-        @Query("location") location: Int? = 0 // Default is 0
+        @Query("location") location: Int? = 0
     ): StoryResponse
 
     @GET("stories/{id}")

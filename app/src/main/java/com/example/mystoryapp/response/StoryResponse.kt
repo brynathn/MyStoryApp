@@ -1,5 +1,6 @@
 package com.example.mystoryapp.response
 
+import android.graphics.Bitmap
 import com.google.gson.annotations.SerializedName
 
 data class StoryResponse(
@@ -28,6 +29,9 @@ data class StoryItem(
 
     @SerializedName("photoUrl")
     val photoUrl: String,
+
+    @SerializedName("bitmap")
+    val bitmap: Bitmap? = null,
 
     @SerializedName("createdAt")
     val createdAt: String,

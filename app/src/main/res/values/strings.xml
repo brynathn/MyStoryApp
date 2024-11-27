@@ -24,4 +24,9 @@
     <string name="upload_story">Upload Story</string>
     <string name="write_your_story_description">Write your story description</string>
     <string name="story_description">Description</string>
+    <string name="appwidget_text">Story Widget</string>
+    <string name="add_widget">Add widget</string>
+    <string name="app_widget_description">This is an app widget description</string>
+    <string name="login_to_see_stories">Login to see stories</string>
+    <string name="no_data_available">No data available</string>
 </resources>
