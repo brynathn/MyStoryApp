@@ -22,6 +22,8 @@ class SignUpActivity : AppCompatActivity() {
         binding = ActivitySignUpBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        supportActionBar?.hide()
+
         val repository = Injection.provideRepository(this)
         authViewModel = ViewModelProvider(
             this,

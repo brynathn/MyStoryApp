@@ -2,12 +2,15 @@ package com.example.mystoryapp.ui.main
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.mystoryapp.AuthViewModelFactory
+import com.example.mystoryapp.R
 import com.example.mystoryapp.databinding.ActivityMainBinding
 import com.example.mystoryapp.di.Injection
 import com.example.mystoryapp.ui.AuthViewModel
@@ -51,13 +54,6 @@ class MainActivity : AppCompatActivity() {
 
         storyViewModel.fetchStories()
 
-        binding.btnLogout.setOnClickListener {
-            authViewModel.logout()
-            Toast.makeText(this, "Berhasil logout", Toast.LENGTH_SHORT).show()
-            MyStoryWidget().refreshWidget(this)
-            navigateToLogin()
-        }
-
         binding.btnAddStory.setOnClickListener {
             val intent = Intent(this, AddStoryActivity::class.java)
             startActivity(intent)
@@ -73,6 +69,23 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_main, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.logout -> {
+                authViewModel.logout()
+                Toast.makeText(this, "Berhasil logout", Toast.LENGTH_SHORT).show()
+                MyStoryWidget().refreshWidget(this)
+                navigateToLogin()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
 
     private fun setupRecyclerView() {
         storyAdapter = StoryAdapter()
