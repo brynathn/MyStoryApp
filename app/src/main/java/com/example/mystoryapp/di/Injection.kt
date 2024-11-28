@@ -14,7 +14,7 @@ object Injection {
         val dataStore = context.dataStore
         val userPreferences = UserPreferences.getInstance(dataStore)
         val apiService = ApiConfig.getApiService()
-        return Repository(apiService, userPreferences)
+        return Repository(apiService, userPreferences, context)
     }
 }
 

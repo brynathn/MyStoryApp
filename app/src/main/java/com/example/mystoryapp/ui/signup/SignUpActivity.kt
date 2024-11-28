@@ -6,6 +6,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.example.mystoryapp.AuthViewModelFactory
+import com.example.mystoryapp.R
 import com.example.mystoryapp.databinding.ActivitySignUpBinding
 import com.example.mystoryapp.di.Injection
 import com.example.mystoryapp.ui.AuthViewModel
@@ -55,7 +56,7 @@ class SignUpActivity : AppCompatActivity() {
                 }
                 is Result.Success -> {
                     showLoading(false)
-                    Toast.makeText(this, "Registrasi berhasil. Silakan login.", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, getString(R.string.regist_success), Toast.LENGTH_SHORT).show()
                     finish()
                 }
                 is Result.Error -> {
@@ -68,7 +69,7 @@ class SignUpActivity : AppCompatActivity() {
 
     private fun validateInput(name: String, email: String, password: String): Boolean {
         if (name.isEmpty() || email.isEmpty() || password.isEmpty()) {
-            Toast.makeText(this, "Semua field harus diisi", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.all_field), Toast.LENGTH_SHORT).show()
             return false
         }
         if (!binding.edRegisterPassword.validatePassword()) {

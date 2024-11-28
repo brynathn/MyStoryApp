@@ -6,6 +6,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
+import com.example.mystoryapp.R
 import com.example.mystoryapp.databinding.ActivityDetailStoryBinding
 import com.example.mystoryapp.di.Injection
 import com.example.mystoryapp.response.StoryItem
@@ -33,7 +34,7 @@ class DetailStoryActivity : AppCompatActivity() {
             observeStoryDetail()
             viewModel.fetchStoryDetail(storyId)
         } else {
-            Toast.makeText(this, "Detail cerita tidak ditemukan.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.story_detail), Toast.LENGTH_SHORT).show()
             finish()
         }
     }

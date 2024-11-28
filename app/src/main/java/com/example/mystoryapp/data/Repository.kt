@@ -1,7 +1,9 @@
 package com.example.mystoryapp.data
 
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.asLiveData
+import com.example.mystoryapp.R
 import com.example.mystoryapp.UserPreferences
 import com.example.mystoryapp.request.LoginRequest
 import com.example.mystoryapp.request.SignUpRequest
@@ -18,7 +20,8 @@ import java.io.File
 
 class Repository(
     private val apiService: ApiService,
-    private val userPreferences: UserPreferences
+    private val userPreferences: UserPreferences,
+    private val context: Context
 ) {
 
     suspend fun getUserToken(): String? {
@@ -34,7 +37,7 @@ class Repository(
                 Result.Error(response.message)
             }
         } catch (e: Exception) {
-            Result.Error("Gagal memuat cerita: ${e.message}")
+            Result.Error(context.getString(R.string.error_load_stories, e.message))
         }
     }
 
@@ -47,7 +50,7 @@ class Repository(
                 Result.Error(response.message)
             }
         } catch (e: Exception) {
-            Result.Error("Gagal memuat detail cerita: ${e.message}")
+            Result.Error(context.getString(R.string.error_load_story_detail, e.message))
         }
     }
 
@@ -75,7 +78,7 @@ class Repository(
                 Result.Error(response.message)
             }
         } catch (e: Exception) {
-            Result.Error("Gagal menambahkan cerita: ${e.message}")
+            Result.Error(context.getString(R.string.error_add_story, e.message))
         }
     }
 
@@ -93,10 +96,10 @@ class Repository(
                 userPreferences.saveUserToken(token)
                 Result.Success(Unit)
             } else {
-                Result.Error("Token tidak ditemukan")
+                Result.Error(context.getString(R.string.error_no_token))
             }
         } catch (e: Exception) {
-            Result.Error(handleException(e, "Login gagal"))
+            Result.Error(context.getString(R.string.error_login, handleException(e)))
         }
     }
 
@@ -105,7 +108,7 @@ class Repository(
             apiService.register(SignUpRequest(name, email, password))
             Result.Success(Unit)
         } catch (e: Exception) {
-            Result.Error(handleException(e, "Registrasi gagal"))
+            Result.Error(context.getString(R.string.error_register, handleException(e)))
         }
     }
 
@@ -114,16 +117,16 @@ class Repository(
             userPreferences.clearUserToken()
             Result.Success(Unit)
         } catch (e: Exception) {
-            Result.Error("Logout gagal: ${e.message}")
+            Result.Error(context.getString(R.string.error_logout, e.message))
         }
     }
 
-    private fun handleException(e: Exception, defaultErrorMessage: String): String {
+    private fun handleException(e: Exception): String {
         return when {
-            e.message?.contains("401") == true -> "Akses tidak diizinkan. Periksa kredensial Anda."
-            e.message?.contains("timeout", ignoreCase = true) == true -> "Waktu koneksi habis. Periksa jaringan Anda."
-            e.message?.contains("Unable to resolve host", ignoreCase = true) == true -> "Tidak dapat terhubung ke server. Periksa koneksi internet Anda."
-            else -> "$defaultErrorMessage: ${e.message ?: "Kesalahan tak dikenal"}"
+            e.message?.contains("401") == true -> context.getString(R.string.error_unauthorized)
+            e.message?.contains("timeout", ignoreCase = true) == true ->  context.getString(R.string.error_timeout)
+            e.message?.contains("Unable to resolve host", ignoreCase = true) == true -> context.getString(R.string.error_no_connection)
+            else -> context.getString(R.string.error_unknown)
         }
     }
 }

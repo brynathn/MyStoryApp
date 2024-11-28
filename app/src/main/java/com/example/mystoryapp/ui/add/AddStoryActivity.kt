@@ -13,6 +13,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import com.example.mystoryapp.R
 import com.example.mystoryapp.databinding.ActivityAddStoryBinding
 import com.example.mystoryapp.reduceFileImage
 import com.example.mystoryapp.Result
@@ -31,7 +32,7 @@ class AddStoryActivity : AppCompatActivity() {
     private val requestPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
             if (!isGranted) {
-                showToast("Permission request denied")
+                showToast(getString(R.string.permission_denied))
             }
         }
 
@@ -53,7 +54,7 @@ class AddStoryActivity : AppCompatActivity() {
                 showImage()
             } else {
                 viewModel.currentImageUri = null
-                showToast("Failed to take a picture")
+                showToast(getString(R.string.take_img_failed))
             }
         }
 
@@ -61,7 +62,7 @@ class AddStoryActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityAddStoryBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        supportActionBar?.title = "Add Story"
+        supportActionBar?.title = getString(R.string.add_story)
 
         viewModel.currentImageUri?.let {
             showImage()
@@ -89,7 +90,7 @@ class AddStoryActivity : AppCompatActivity() {
             val file = viewModel.selectedFile ?: return@setOnClickListener
 
             if (description.isEmpty()) {
-                showToast("Description cannot be empty")
+                showToast(getString(R.string.description_empty))
                 return@setOnClickListener
             }
 
@@ -104,7 +105,7 @@ class AddStoryActivity : AppCompatActivity() {
                 is Result.Loading -> showLoading(true)
                 is Result.Success -> {
                     showLoading(false)
-                    showToast("Story uploaded successfully")
+                    showToast(getString(R.string.story_success))
 
                     val intent = Intent(this, MainActivity::class.java).apply {
                         putExtra("REFRESH_LIST", true)

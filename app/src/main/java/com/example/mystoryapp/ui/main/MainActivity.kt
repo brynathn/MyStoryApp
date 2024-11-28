@@ -6,6 +6,7 @@ import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkRequest
 import android.os.Bundle
+import android.provider.Settings
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -93,9 +94,13 @@ class MainActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
+            R.id.language -> {
+                startActivity(Intent(Settings.ACTION_LOCALE_SETTINGS))
+                true
+            }
             R.id.logout -> {
                 authViewModel.logout()
-                Toast.makeText(this, "Berhasil logout", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.logout_success), Toast.LENGTH_SHORT).show()
                 navigateToLogin()
                 true
             }
