@@ -20,17 +20,13 @@ import com.example.mystoryapp.di.Injection
 import com.example.mystoryapp.getImageUri
 import com.example.mystoryapp.ui.main.MainActivity
 import com.example.mystoryapp.uriToFile
-import java.io.File
 
 class AddStoryActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityAddStoryBinding
     private val viewModel: AddStoryViewModel by viewModels {
-        AddStoryViewModelFactory(Injection.provideRepository(this))
+        AddStoryViewModelFactory(Injection.provideRepository(this), this)
     }
-
-    private var selectedFile: File? = null
-    private var currentImageUri: Uri? = null
 
     private val requestPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
@@ -42,8 +38,8 @@ class AddStoryActivity : AppCompatActivity() {
     private val launcherGallery =
         registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri: Uri? ->
             if (uri != null) {
-                currentImageUri = uri
-                selectedFile = uriToFile(uri, this)
+                viewModel.currentImageUri = uri
+                viewModel.selectedFile = uriToFile(uri, this)
                 showImage()
             } else {
                 Log.d("Photo Picker", "No media selected")
@@ -53,10 +49,10 @@ class AddStoryActivity : AppCompatActivity() {
     private val launcherIntentCamera =
         registerForActivityResult(ActivityResultContracts.TakePicture()) { isSuccess ->
             if (isSuccess) {
-                selectedFile = currentImageUri?.let { uriToFile(it, this) }
+                viewModel.selectedFile = viewModel.currentImageUri?.let { uriToFile(it, this) }
                 showImage()
             } else {
-                currentImageUri = null
+                viewModel.currentImageUri = null
                 showToast("Failed to take a picture")
             }
         }
@@ -66,6 +62,10 @@ class AddStoryActivity : AppCompatActivity() {
         binding = ActivityAddStoryBinding.inflate(layoutInflater)
         setContentView(binding.root)
         supportActionBar?.title = "Add Story"
+
+        viewModel.currentImageUri?.let {
+            showImage()
+        }
 
         if (!allPermissionsGranted()) {
             requestPermissionLauncher.launch(REQUIRED_PERMISSION)
@@ -86,7 +86,7 @@ class AddStoryActivity : AppCompatActivity() {
 
         binding.buttonAdd.setOnClickListener {
             val description = binding.edAddDescription.text.toString()
-            val file = selectedFile ?: return@setOnClickListener
+            val file = viewModel.selectedFile ?: return@setOnClickListener
 
             if (description.isEmpty()) {
                 showToast("Description cannot be empty")
@@ -122,8 +122,8 @@ class AddStoryActivity : AppCompatActivity() {
 
 
     private fun startCamera() {
-        currentImageUri = getImageUri(this)
-        launcherIntentCamera.launch(currentImageUri!!)
+        viewModel.currentImageUri = getImageUri(this)
+        launcherIntentCamera.launch(viewModel.currentImageUri!!)
     }
 
     private fun openGallery() {
@@ -131,7 +131,7 @@ class AddStoryActivity : AppCompatActivity() {
     }
 
     private fun showImage() {
-        binding.ivPreview.setImageURI(currentImageUri)
+        binding.ivPreview.setImageURI(viewModel.currentImageUri)
     }
 
     private fun showLoading(isLoading: Boolean) {

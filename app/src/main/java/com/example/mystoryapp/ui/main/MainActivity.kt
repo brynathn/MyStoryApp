@@ -1,6 +1,10 @@
 package com.example.mystoryapp.ui.main
 
+import android.content.Context
 import android.content.Intent
+import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkRequest
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -38,15 +42,22 @@ class MainActivity : AppCompatActivity() {
 
         setupRecyclerView()
 
+        observeNetworkStatus()
+
         storyViewModel.stories.observe(this) { result ->
             when (result) {
-                is Result.Loading -> showLoading(true)
+                is Result.Loading -> {
+                    showLoading(true)
+                    showError(false)
+                }
                 is Result.Success -> {
                     showLoading(false)
+                    showError(false)
                     storyAdapter.submitList(result.data)
                 }
                 is Result.Error -> {
                     showLoading(false)
+                    showError(true)
                     Toast.makeText(this, result.errorMessage, Toast.LENGTH_SHORT).show()
                 }
             }
@@ -58,7 +69,21 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this, AddStoryActivity::class.java)
             startActivity(intent)
         }
+    }
 
+    private fun observeNetworkStatus() {
+        val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val networkRequest = NetworkRequest.Builder().build()
+
+        connectivityManager.registerNetworkCallback(networkRequest, object : ConnectivityManager.NetworkCallback() {
+            override fun onAvailable(network: Network) {
+                storyViewModel.updateConnectionStatus(true)
+            }
+
+            override fun onLost(network: Network) {
+                storyViewModel.updateConnectionStatus(false)
+            }
+        })
     }
 
     override fun onResume() {
@@ -104,5 +129,10 @@ class MainActivity : AppCompatActivity() {
     private fun showLoading(isLoading: Boolean) {
         binding.loadingContainer.visibility = if (isLoading) View.VISIBLE else View.GONE
     }
+
+    private fun showError(isVisible: Boolean) {
+        binding.errorText.visibility = if (isVisible) View.VISIBLE else View.GONE
+    }
 }
+
 

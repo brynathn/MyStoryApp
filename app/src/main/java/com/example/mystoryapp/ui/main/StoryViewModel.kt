@@ -14,6 +14,8 @@ class StoryViewModel(private val repository: Repository) : ViewModel() {
     private val _stories = MutableLiveData<Result<List<StoryItem>>>()
     val stories: LiveData<Result<List<StoryItem>>> = _stories
 
+    private val _isConnected = MutableLiveData<Boolean>()
+
     fun fetchStories() {
         viewModelScope.launch {
             val token = repository.getUserToken()
@@ -25,4 +27,12 @@ class StoryViewModel(private val repository: Repository) : ViewModel() {
             }
         }
     }
+
+    fun updateConnectionStatus(isConnected: Boolean) {
+        _isConnected.postValue(isConnected)
+        if (isConnected) {
+            fetchStories()
+        }
+    }
 }
+
