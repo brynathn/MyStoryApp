@@ -16,12 +16,25 @@ class StoryViewModel(private val repository: Repository) : ViewModel() {
 
     private val _isConnected = MutableLiveData<Boolean>()
 
-    fun fetchStories() {
+    private var hasFetchedData = false
+
+    init {
+        fetchStoriesIfNeeded()
+    }
+
+    private fun fetchStoriesIfNeeded() {
+        if (!hasFetchedData) {
+            fetchStories()
+        }
+    }
+
+    private fun fetchStories() {
         viewModelScope.launch {
             val token = repository.getUserToken()
             if (token != null) {
                 _stories.value = Result.Loading
                 _stories.value = repository.getAllStories(token)
+                hasFetchedData = true
             } else {
                 _stories.value = Result.Error("Token tidak tersedia")
             }
@@ -29,10 +42,14 @@ class StoryViewModel(private val repository: Repository) : ViewModel() {
     }
 
     fun updateConnectionStatus(isConnected: Boolean) {
+        val wasDisconnected = _isConnected.value == false
         _isConnected.postValue(isConnected)
-        if (isConnected) {
+
+        if (isConnected && (wasDisconnected || !hasFetchedData)) {
             fetchStories()
         }
     }
 }
+
+
 

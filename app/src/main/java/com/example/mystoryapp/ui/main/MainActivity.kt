@@ -21,7 +21,6 @@ import com.example.mystoryapp.ui.AuthViewModel
 import com.example.mystoryapp.ui.login.LoginActivity
 import com.example.mystoryapp.Result
 import com.example.mystoryapp.ui.add.AddStoryActivity
-import com.example.mystoryapp.ui.widget.MyStoryWidget
 
 class MainActivity : AppCompatActivity() {
 
@@ -37,13 +36,19 @@ class MainActivity : AppCompatActivity() {
 
         val repository = Injection.provideRepository(this)
         authViewModel = ViewModelProvider(this, AuthViewModelFactory(repository))[AuthViewModel::class.java]
-
         storyViewModel = ViewModelProvider(this, StoryViewModelFactory(repository))[StoryViewModel::class.java]
 
         setupRecyclerView()
-
         observeNetworkStatus()
+        observeViewModel()
 
+        binding.btnAddStory.setOnClickListener {
+            val intent = Intent(this, AddStoryActivity::class.java)
+            startActivity(intent)
+        }
+    }
+
+    private fun observeViewModel() {
         storyViewModel.stories.observe(this) { result ->
             when (result) {
                 is Result.Loading -> {
@@ -58,22 +63,17 @@ class MainActivity : AppCompatActivity() {
                 is Result.Error -> {
                     showLoading(false)
                     showError(true)
-                    Toast.makeText(this, result.errorMessage, Toast.LENGTH_SHORT).show()
                 }
             }
-        }
-
-        storyViewModel.fetchStories()
-
-        binding.btnAddStory.setOnClickListener {
-            val intent = Intent(this, AddStoryActivity::class.java)
-            startActivity(intent)
         }
     }
 
     private fun observeNetworkStatus() {
         val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val networkRequest = NetworkRequest.Builder().build()
+
+        val isConnected = connectivityManager.activeNetwork != null
+        storyViewModel.updateConnectionStatus(isConnected)
 
         connectivityManager.registerNetworkCallback(networkRequest, object : ConnectivityManager.NetworkCallback() {
             override fun onAvailable(network: Network) {
@@ -86,14 +86,6 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
-    override fun onResume() {
-        super.onResume()
-        if (intent.getBooleanExtra("REFRESH_LIST", false)) {
-            storyViewModel.fetchStories()
-            intent.removeExtra("REFRESH_LIST")
-        }
-    }
-
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)
         return true
@@ -104,7 +96,6 @@ class MainActivity : AppCompatActivity() {
             R.id.logout -> {
                 authViewModel.logout()
                 Toast.makeText(this, "Berhasil logout", Toast.LENGTH_SHORT).show()
-                MyStoryWidget().refreshWidget(this)
                 navigateToLogin()
                 true
             }
