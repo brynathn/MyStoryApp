@@ -1,7 +1,10 @@
 package com.example.mystoryapp.ui.signup
 
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
@@ -46,6 +49,7 @@ class SignUpActivity : AppCompatActivity() {
         }
 
         observeViewModel()
+        playAnimation()
     }
 
     private fun observeViewModel() {
@@ -80,6 +84,43 @@ class SignUpActivity : AppCompatActivity() {
 
     private fun showLoading(isLoading: Boolean) {
         binding.loadingContainer.visibility = if (isLoading) android.view.View.VISIBLE else android.view.View.GONE
+    }
+
+    private fun playAnimation() {
+        ObjectAnimator.ofFloat(binding.imageView, View.TRANSLATION_X, -30f, 30f).apply {
+            duration = 6000
+            repeatCount = ObjectAnimator.INFINITE
+            repeatMode = ObjectAnimator.REVERSE
+        }.start()
+        val nameTextView =
+            ObjectAnimator.ofFloat(binding.tvRegisterName, View.ALPHA, 1f).setDuration(100)
+        val nameEditTextLayout =
+            ObjectAnimator.ofFloat(binding.tilRegisterName, View.ALPHA, 1f).setDuration(100)
+        val emailTextView =
+            ObjectAnimator.ofFloat(binding.tvRegisterEmail, View.ALPHA, 1f).setDuration(100)
+        val emailEditTextLayout =
+            ObjectAnimator.ofFloat(binding.tilRegisterEmail, View.ALPHA, 1f).setDuration(100)
+        val passwordTextView =
+            ObjectAnimator.ofFloat(binding.tvRegisterPassword, View.ALPHA, 1f).setDuration(100)
+        val passwordEditTextLayout =
+            ObjectAnimator.ofFloat(binding.tilRegisterPassword, View.ALPHA, 1f).setDuration(100)
+        val loginLinkTextView =
+            ObjectAnimator.ofFloat(binding.tvLoginLink, View.ALPHA, 1f).setDuration(100)
+        val regist = ObjectAnimator.ofFloat(binding.btnRegister, View.ALPHA, 1f).setDuration(100)
+
+        AnimatorSet().apply {
+            playSequentially(
+                nameTextView,
+                nameEditTextLayout,
+                emailTextView,
+                emailEditTextLayout,
+                passwordTextView,
+                passwordEditTextLayout,
+                loginLinkTextView,
+                regist
+            )
+            startDelay = 100
+        }.start()
     }
 }
 

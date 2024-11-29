@@ -1,8 +1,11 @@
 package com.example.mystoryapp.ui.login
 
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.content.Intent
 import android.os.Bundle
 import android.util.Patterns
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
@@ -30,6 +33,7 @@ class LoginActivity : AppCompatActivity() {
         setupViewModel()
         setupUI()
         observeViewModel()
+        playAnimation()
     }
 
     private fun setupViewModel() {
@@ -105,6 +109,38 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun showLoading(isLoading: Boolean) {
-        binding.loadingContainer.visibility = if (isLoading) android.view.View.VISIBLE else android.view.View.GONE
+        binding.loadingContainer.visibility = if (isLoading) View.VISIBLE else View.GONE
+    }
+
+    private fun playAnimation() {
+        ObjectAnimator.ofFloat(binding.imageView, View.TRANSLATION_X, -30f, 30f).apply {
+            duration = 6000
+            repeatCount = ObjectAnimator.INFINITE
+            repeatMode = ObjectAnimator.REVERSE
+        }.start()
+
+        val emailTextView =
+            ObjectAnimator.ofFloat(binding.tvLoginEmail, View.ALPHA, 1f).setDuration(100)
+        val emailEditTextLayout =
+            ObjectAnimator.ofFloat(binding.tilLoginEmail, View.ALPHA, 1f).setDuration(100)
+        val passwordTextView =
+            ObjectAnimator.ofFloat(binding.tvLoginPassword, View.ALPHA, 1f).setDuration(100)
+        val passwordEditTextLayout =
+            ObjectAnimator.ofFloat(binding.tilLoginPassword, View.ALPHA, 1f).setDuration(100)
+        val registerLinkTextView =
+            ObjectAnimator.ofFloat(binding.tvRegisterLink, View.ALPHA, 1f).setDuration(100)
+        val login = ObjectAnimator.ofFloat(binding.btnLogin, View.ALPHA, 1f).setDuration(100)
+
+        AnimatorSet().apply {
+            playSequentially(
+                emailTextView,
+                emailEditTextLayout,
+                passwordTextView,
+                passwordEditTextLayout,
+                registerLinkTextView,
+                login
+            )
+            startDelay = 100
+        }.start()
     }
 }
