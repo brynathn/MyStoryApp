@@ -3,7 +3,6 @@ package com.example.mystoryapp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.mystoryapp.data.Repository
-import com.example.mystoryapp.retrofit.ApiService
 import com.example.mystoryapp.ui.AuthViewModel
 
 class AuthViewModelFactory(private val repository: Repository) : ViewModelProvider.Factory {
