@@ -20,8 +20,9 @@ import com.example.mystoryapp.databinding.ActivityMainBinding
 import com.example.mystoryapp.di.Injection
 import com.example.mystoryapp.ui.AuthViewModel
 import com.example.mystoryapp.ui.login.LoginActivity
-import com.example.mystoryapp.Result
+import com.example.mystoryapp.AppResult
 import com.example.mystoryapp.ui.add.AddStoryActivity
+import com.example.mystoryapp.ui.location.MapsActivity
 
 class MainActivity : AppCompatActivity() {
 
@@ -52,16 +53,16 @@ class MainActivity : AppCompatActivity() {
     private fun observeViewModel() {
         storyViewModel.stories.observe(this) { result ->
             when (result) {
-                is Result.Loading -> {
+                is AppResult.Loading -> {
                     showLoading(true)
                     showError(false)
                 }
-                is Result.Success -> {
+                is AppResult.Success -> {
                     showLoading(false)
                     showError(false)
                     storyAdapter.submitList(result.data)
                 }
-                is Result.Error -> {
+                is AppResult.Error -> {
                     showLoading(false)
                     showError(true)
                 }
@@ -94,6 +95,10 @@ class MainActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
+            R.id.action_maps -> {
+                navigateToMaps()
+                true
+            }
             R.id.language -> {
                 startActivity(Intent(Settings.ACTION_LOCALE_SETTINGS))
                 true
@@ -118,6 +123,12 @@ class MainActivity : AppCompatActivity() {
 
     private fun navigateToLogin() {
         val intent = Intent(this, LoginActivity::class.java)
+        startActivity(intent)
+        finish()
+    }
+
+    private fun navigateToMaps() {
+        val intent = Intent(this, MapsActivity::class.java)
         startActivity(intent)
         finish()
     }

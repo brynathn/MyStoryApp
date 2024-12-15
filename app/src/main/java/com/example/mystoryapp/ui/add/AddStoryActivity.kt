@@ -16,7 +16,7 @@ import androidx.core.content.ContextCompat
 import com.example.mystoryapp.R
 import com.example.mystoryapp.databinding.ActivityAddStoryBinding
 import com.example.mystoryapp.reduceFileImage
-import com.example.mystoryapp.Result
+import com.example.mystoryapp.AppResult
 import com.example.mystoryapp.di.Injection
 import com.example.mystoryapp.getImageUri
 import com.example.mystoryapp.ui.main.MainActivity
@@ -100,10 +100,10 @@ class AddStoryActivity : AppCompatActivity() {
     }
 
     private fun observeViewModel() {
-        viewModel.uploadResult.observe(this) { result ->
+        viewModel.uploadAppResult.observe(this) { result ->
             when (result) {
-                is Result.Loading -> showLoading(true)
-                is Result.Success -> {
+                is AppResult.Loading -> showLoading(true)
+                is AppResult.Success -> {
                     showLoading(false)
                     showToast(getString(R.string.story_success))
 
@@ -113,7 +113,7 @@ class AddStoryActivity : AppCompatActivity() {
                     startActivity(intent)
                     finish()
                 }
-                is Result.Error -> {
+                is AppResult.Error -> {
                     showLoading(false)
                     showToast(result.errorMessage)
                 }

@@ -15,7 +15,7 @@ import com.example.mystoryapp.databinding.ActivityLoginBinding
 import com.example.mystoryapp.ui.AuthViewModel
 import com.example.mystoryapp.ui.main.MainActivity
 import com.example.mystoryapp.ui.signup.SignUpActivity
-import com.example.mystoryapp.Result
+import com.example.mystoryapp.AppResult
 import com.example.mystoryapp.di.Injection
 import com.example.mystoryapp.ui.widget.MyStoryWidget
 
@@ -69,16 +69,16 @@ class LoginActivity : AppCompatActivity() {
     private fun observeViewModel() {
         authViewModel.loginState.observe(this) { state ->
             when (state) {
-                is Result.Loading -> {
+                is AppResult.Loading -> {
                     showLoading(true)
                 }
-                is Result.Success -> {
+                is AppResult.Success -> {
                     showLoading(false)
                     Toast.makeText(this, getString(R.string.login_success), Toast.LENGTH_SHORT).show()
                     MyStoryWidget().refreshWidget(this)
                     navigateToMainActivity()
                 }
-                is Result.Error -> {
+                is AppResult.Error -> {
                     showLoading(false)
                     Toast.makeText(this, state.errorMessage, Toast.LENGTH_SHORT).show()
                 }

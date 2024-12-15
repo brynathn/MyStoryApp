@@ -11,7 +11,7 @@ import com.example.mystoryapp.R
 import com.example.mystoryapp.data.Repository
 import com.example.mystoryapp.response.StoryItem
 import kotlinx.coroutines.runBlocking
-import com.example.mystoryapp.Result
+import com.example.mystoryapp.AppResult
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URL
@@ -33,7 +33,7 @@ class StackRemoteViewsFactory(
         val token = runBlocking { repository.getUserToken() }
         if (!token.isNullOrEmpty()) {
             val result = runBlocking { repository.getAllStories(token) }
-            if (result is Result.Success) {
+            if (result is AppResult.Success) {
                 Log.d("Widget", "Fetched ${result.data.size} stories")
                 result.data.forEach { story ->
                     Log.d("Widget", "Story: ${story.name}, Photo URL: ${story.photoUrl}")

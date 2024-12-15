@@ -10,7 +10,7 @@ import com.example.mystoryapp.R
 import com.example.mystoryapp.databinding.ActivityDetailStoryBinding
 import com.example.mystoryapp.di.Injection
 import com.example.mystoryapp.response.StoryItem
-import com.example.mystoryapp.Result
+import com.example.mystoryapp.AppResult
 
 class DetailStoryActivity : AppCompatActivity() {
 
@@ -42,12 +42,12 @@ class DetailStoryActivity : AppCompatActivity() {
     private fun observeStoryDetail() {
         viewModel.storyDetail.observe(this) { result ->
             when (result) {
-                is Result.Loading -> showLoading(true)
-                is Result.Success -> {
+                is AppResult.Loading -> showLoading(true)
+                is AppResult.Success -> {
                     showLoading(false)
                     displayStory(result.data)
                 }
-                is Result.Error -> {
+                is AppResult.Error -> {
                     showLoading(false)
                     Toast.makeText(this, result.errorMessage, Toast.LENGTH_SHORT).show()
                 }

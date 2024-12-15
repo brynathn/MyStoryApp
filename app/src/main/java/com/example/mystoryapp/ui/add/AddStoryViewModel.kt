@@ -6,13 +6,13 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mystoryapp.data.Repository
-import com.example.mystoryapp.Result
+import com.example.mystoryapp.AppResult
 import kotlinx.coroutines.launch
 import java.io.File
 
 class AddStoryViewModel(private val repository: Repository, private val savedStateHandle: SavedStateHandle) : ViewModel() {
 
-    val uploadResult = MutableLiveData<Result<Unit>>()
+    val uploadAppResult = MutableLiveData<AppResult<Unit>>()
 
     var currentImageUri: Uri?
         get() = savedStateHandle.get<Uri>("CURRENT_IMAGE_URI")
@@ -24,9 +24,9 @@ class AddStoryViewModel(private val repository: Repository, private val savedSta
     fun uploadStory(description: String, imageFile: File, lat: Float? = null, lon: Float? = null) {
         viewModelScope.launch {
             val token = repository.getUserToken() ?: return@launch
-            uploadResult.value = Result.Loading
+            uploadAppResult.value = AppResult.Loading
             val result = repository.addStory(description, imageFile, token, lat, lon)
-            uploadResult.value = result
+            uploadAppResult.value = result
         }
     }
 }

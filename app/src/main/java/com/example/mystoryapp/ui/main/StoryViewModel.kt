@@ -7,12 +7,12 @@ import androidx.lifecycle.viewModelScope
 import com.example.mystoryapp.data.Repository
 import com.example.mystoryapp.response.StoryItem
 import kotlinx.coroutines.launch
-import com.example.mystoryapp.Result
+import com.example.mystoryapp.AppResult
 
 class StoryViewModel(private val repository: Repository) : ViewModel() {
 
-    private val _stories = MutableLiveData<Result<List<StoryItem>>>()
-    val stories: LiveData<Result<List<StoryItem>>> = _stories
+    private val _stories = MutableLiveData<AppResult<List<StoryItem>>>()
+    val stories: LiveData<AppResult<List<StoryItem>>> = _stories
 
     private val _isConnected = MutableLiveData<Boolean>()
 
@@ -32,11 +32,11 @@ class StoryViewModel(private val repository: Repository) : ViewModel() {
         viewModelScope.launch {
             val token = repository.getUserToken()
             if (token != null) {
-                _stories.value = Result.Loading
+                _stories.value = AppResult.Loading
                 _stories.value = repository.getAllStories(token)
                 hasFetchedData = true
             } else {
-                _stories.value = Result.Error("Token tidak tersedia")
+                _stories.value = AppResult.Error("Token tidak tersedia")
             }
         }
     }

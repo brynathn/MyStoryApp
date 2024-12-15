@@ -56,4 +56,6 @@
     <string name="error_no_connection">Unable to connect to the server. Check your internet connection.</string>
     <string name="error_unknown">An unknown error occurred</string>
     <string name="logout_success">Logout success!</string>
+    <string name="title_activity_maps">MapsActivity</string>
+    <string name="maps">Maps</string>
 </resources>

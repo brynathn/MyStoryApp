@@ -9,7 +9,7 @@ import com.example.mystoryapp.request.LoginRequest
 import com.example.mystoryapp.request.SignUpRequest
 import com.example.mystoryapp.retrofit.ApiService
 import kotlinx.coroutines.flow.map
-import com.example.mystoryapp.Result
+import com.example.mystoryapp.AppResult
 import com.example.mystoryapp.response.StoryItem
 import kotlinx.coroutines.flow.firstOrNull
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -28,31 +28,45 @@ class Repository(
         return userPreferences.getUserToken().firstOrNull()
     }
 
-    suspend fun getAllStories(token: String): Result<List<StoryItem>> {
+    suspend fun getAllStories(token: String): AppResult<List<StoryItem>> {
         return try {
             val response = apiService.getAllStories("Bearer $token")
             if (!response.error) {
-                Result.Success(response.listStory ?: emptyList())
+                AppResult.Success(response.listStory ?: emptyList())
             } else {
-                Result.Error(response.message)
+                AppResult.Error(response.message)
             }
         } catch (e: Exception) {
-            Result.Error(context.getString(R.string.error_load_stories, e.message))
+            AppResult.Error(context.getString(R.string.error_load_stories, e.message))
         }
     }
 
-    suspend fun getStoryDetail(token: String, storyId: String): Result<StoryItem> {
+    suspend fun getStoryDetail(token: String, storyId: String): AppResult<StoryItem> {
         return try {
             val response = apiService.getStoryDetail("Bearer $token", storyId)
             if (!response.error && response.story != null) {
-                Result.Success(response.story)
+                AppResult.Success(response.story)
             } else {
-                Result.Error(response.message)
+                AppResult.Error(response.message)
             }
         } catch (e: Exception) {
-            Result.Error(context.getString(R.string.error_load_story_detail, e.message))
+            AppResult.Error(context.getString(R.string.error_load_story_detail, e.message))
         }
     }
+
+    suspend fun getStoriesWithLocation(token: String): AppResult<List<StoryItem>> {
+        return try {
+            val response = apiService.getStoriesWithLocation("Bearer $token")
+            if (!response.error) {
+                AppResult.Success(response.listStory!!.filter { it.lat != null && it.lon != null })
+            } else {
+                AppResult.Error(response.message)
+            }
+        } catch (e: Exception) {
+            AppResult.Error(context.getString(R.string.error_load_stories, e.message))
+        }
+    }
+
 
     suspend fun addStory(
         description: String,
@@ -60,7 +74,7 @@ class Repository(
         token: String,
         lat: Float? = null,
         lon: Float? = null
-    ): Result<Unit> {
+    ): AppResult<Unit> {
         return try {
             val requestDescription = description.toRequestBody("text/plain".toMediaTypeOrNull())
 
@@ -73,12 +87,12 @@ class Repository(
             val response = apiService.addStory("Bearer $token", requestDescription, imageMultipart, requestLat, requestLon)
 
             if (!response.error) {
-                Result.Success(Unit)
+                AppResult.Success(Unit)
             } else {
-                Result.Error(response.message)
+                AppResult.Error(response.message)
             }
         } catch (e: Exception) {
-            Result.Error(context.getString(R.string.error_add_story, e.message))
+            AppResult.Error(context.getString(R.string.error_add_story, e.message))
         }
     }
 
@@ -88,36 +102,36 @@ class Repository(
             .asLiveData()
     }
 
-    suspend fun login(email: String, password: String): Result<Unit> {
+    suspend fun login(email: String, password: String): AppResult<Unit> {
         return try {
             val response = apiService.login(LoginRequest(email, password))
             val token = response.loginResult?.token
             if (!token.isNullOrEmpty()) {
                 userPreferences.saveUserToken(token)
-                Result.Success(Unit)
+                AppResult.Success(Unit)
             } else {
-                Result.Error(context.getString(R.string.error_no_token))
+                AppResult.Error(context.getString(R.string.error_no_token))
             }
         } catch (e: Exception) {
-            Result.Error(context.getString(R.string.error_login, handleException(e)))
+            AppResult.Error(context.getString(R.string.error_login, handleException(e)))
         }
     }
 
-    suspend fun register(name: String, email: String, password: String): Result<Unit> {
+    suspend fun register(name: String, email: String, password: String): AppResult<Unit> {
         return try {
             apiService.register(SignUpRequest(name, email, password))
-            Result.Success(Unit)
+            AppResult.Success(Unit)
         } catch (e: Exception) {
-            Result.Error(context.getString(R.string.error_register, handleException(e)))
+            AppResult.Error(context.getString(R.string.error_register, handleException(e)))
         }
     }
 
-    suspend fun logout(): Result<Unit> {
+    suspend fun logout(): AppResult<Unit> {
         return try {
             userPreferences.clearUserToken()
-            Result.Success(Unit)
+            AppResult.Success(Unit)
         } catch (e: Exception) {
-            Result.Error(context.getString(R.string.error_logout, e.message))
+            AppResult.Error(context.getString(R.string.error_logout, e.message))
         }
     }
 

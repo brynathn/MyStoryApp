@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.safe.args)
     alias(libs.plugins.dev.ksp)
+    alias(libs.plugins.google.android.libraries.mapsplatform.secrets.gradle.plugin)
 }
 
 android {
@@ -60,6 +61,7 @@ dependencies {
     implementation (libs.logging.interceptor)
     implementation(libs.dagger.compiler)
     implementation (libs.androidx.datastore.preferences)
+    implementation(libs.play.services.maps)
     ksp(libs.compiler)
     ksp(libs.dagger.compiler)
 

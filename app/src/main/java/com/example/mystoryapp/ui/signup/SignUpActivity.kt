@@ -14,7 +14,7 @@ import com.example.mystoryapp.databinding.ActivitySignUpBinding
 import com.example.mystoryapp.di.Injection
 import com.example.mystoryapp.ui.AuthViewModel
 import com.example.mystoryapp.ui.login.LoginActivity
-import com.example.mystoryapp.Result
+import com.example.mystoryapp.AppResult
 
 
 class SignUpActivity : AppCompatActivity() {
@@ -53,17 +53,17 @@ class SignUpActivity : AppCompatActivity() {
     }
 
     private fun observeViewModel() {
-        authViewModel.registerResult.observe(this) { result ->
+        authViewModel.registerAppResult.observe(this) { result ->
             when (result) {
-                is Result.Loading -> {
+                is AppResult.Loading -> {
                     showLoading(true)
                 }
-                is Result.Success -> {
+                is AppResult.Success -> {
                     showLoading(false)
                     Toast.makeText(this, getString(R.string.regist_success), Toast.LENGTH_SHORT).show()
                     finish()
                 }
-                is Result.Error -> {
+                is AppResult.Error -> {
                     showLoading(false)
                     Toast.makeText(this, result.errorMessage, Toast.LENGTH_SHORT).show()
                 }
