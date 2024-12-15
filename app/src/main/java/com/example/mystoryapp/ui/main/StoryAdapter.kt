@@ -16,8 +16,9 @@ import com.example.mystoryapp.databinding.ItemStoryBinding
 import com.example.mystoryapp.response.StoryItem
 import com.example.mystoryapp.ui.detail.DetailStoryActivity
 import androidx.core.util.Pair
+import androidx.paging.PagingDataAdapter
 
-class StoryAdapter : ListAdapter<StoryItem, StoryAdapter.StoryViewHolder>(DIFF_CALLBACK) {
+class StoryAdapter : PagingDataAdapter<StoryItem, StoryAdapter.StoryViewHolder>(DIFF_CALLBACK) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StoryViewHolder {
         val binding = ItemStoryBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -26,14 +27,10 @@ class StoryAdapter : ListAdapter<StoryItem, StoryAdapter.StoryViewHolder>(DIFF_C
 
     override fun onBindViewHolder(holder: StoryViewHolder, position: Int) {
         val story = getItem(position)
-        holder.bind(story)
+        story?.let { holder.bind(it) }
     }
 
     class StoryViewHolder(private val binding: ItemStoryBinding) : RecyclerView.ViewHolder(binding.root) {
-        private var imgPhoto: ImageView = itemView.findViewById(R.id.iv_item_photo)
-        private var tvName: TextView = itemView.findViewById(R.id.tv_item_name)
-        private var tvDescription: TextView = itemView.findViewById(R.id.tv_item_desc)
-
         fun bind(story: StoryItem) {
             binding.tvItemName.text = story.name
             binding.tvItemDesc.text = story.description
@@ -45,14 +42,7 @@ class StoryAdapter : ListAdapter<StoryItem, StoryAdapter.StoryViewHolder>(DIFF_C
                 val intent = Intent(itemView.context, DetailStoryActivity::class.java).apply {
                     putExtra(DetailStoryActivity.EXTRA_STORY_ID, story.id)
                 }
-                val optionsCompat: ActivityOptionsCompat =
-                    ActivityOptionsCompat.makeSceneTransitionAnimation(
-                        itemView.context as Activity,
-                        Pair(imgPhoto, "story"),
-                        Pair(tvName, "name"),
-                        Pair(tvDescription, "description"),
-                    )
-                itemView.context.startActivity(intent,  optionsCompat.toBundle())
+                itemView.context.startActivity(intent)
             }
         }
     }
@@ -64,4 +54,5 @@ class StoryAdapter : ListAdapter<StoryItem, StoryAdapter.StoryViewHolder>(DIFF_C
         }
     }
 }
+
 

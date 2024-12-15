@@ -3,6 +3,9 @@ package com.example.mystoryapp.data
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.asLiveData
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import com.example.mystoryapp.R
 import com.example.mystoryapp.UserPreferences
 import com.example.mystoryapp.request.LoginRequest
@@ -11,6 +14,8 @@ import com.example.mystoryapp.retrofit.ApiService
 import kotlinx.coroutines.flow.map
 import com.example.mystoryapp.AppResult
 import com.example.mystoryapp.response.StoryItem
+import com.example.mystoryapp.ui.main.StoryPagingSource
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
@@ -67,6 +72,15 @@ class Repository(
         }
     }
 
+    fun getStoriesPagingData(token: String): Flow<PagingData<StoryItem>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = 20,
+                enablePlaceholders = false
+            ),
+            pagingSourceFactory = { StoryPagingSource(apiService, token) }
+        ).flow
+    }
 
     suspend fun addStory(
         description: String,

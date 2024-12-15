@@ -62,6 +62,7 @@ dependencies {
     implementation(libs.dagger.compiler)
     implementation (libs.androidx.datastore.preferences)
     implementation(libs.play.services.maps)
+    implementation(libs.androidx.paging.runtime.ktx)
     ksp(libs.compiler)
     ksp(libs.dagger.compiler)
 

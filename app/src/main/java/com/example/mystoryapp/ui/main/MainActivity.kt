@@ -9,10 +9,12 @@ import android.os.Bundle
 import android.provider.Settings
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.mystoryapp.AuthViewModelFactory
 import com.example.mystoryapp.R
@@ -20,9 +22,10 @@ import com.example.mystoryapp.databinding.ActivityMainBinding
 import com.example.mystoryapp.di.Injection
 import com.example.mystoryapp.ui.AuthViewModel
 import com.example.mystoryapp.ui.login.LoginActivity
-import com.example.mystoryapp.AppResult
 import com.example.mystoryapp.ui.add.AddStoryActivity
 import com.example.mystoryapp.ui.location.MapsActivity
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 
@@ -30,6 +33,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var authViewModel: AuthViewModel
     private lateinit var storyViewModel: StoryViewModel
     private lateinit var storyAdapter: StoryAdapter
+    private lateinit var connectivityManager: ConnectivityManager
+    private lateinit var networkCallback: ConnectivityManager.NetworkCallback
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,51 +46,67 @@ class MainActivity : AppCompatActivity() {
         storyViewModel = ViewModelProvider(this, StoryViewModelFactory(repository))[StoryViewModel::class.java]
 
         setupRecyclerView()
-        observeNetworkStatus()
-        observeViewModel()
+
+        storyViewModel.getToken()
+        storyViewModel.token.observe(this) { token ->
+            if (token.isNullOrEmpty()) {
+                navigateToLogin()
+            } else {
+                observeNetworkStatus()
+                observeViewModel()
+            }
+        }
 
         binding.btnAddStory.setOnClickListener {
             val intent = Intent(this, AddStoryActivity::class.java)
             startActivity(intent)
         }
+
+        binding.rvStories.adapter = storyAdapter.withLoadStateFooter(
+            footer = LoadingStateAdapter { storyAdapter.retry() }
+        )
     }
 
     private fun observeViewModel() {
-        storyViewModel.stories.observe(this) { result ->
-            when (result) {
-                is AppResult.Loading -> {
-                    showLoading(true)
-                    showError(false)
-                }
-                is AppResult.Success -> {
-                    showLoading(false)
-                    showError(false)
-                    storyAdapter.submitList(result.data)
-                }
-                is AppResult.Error -> {
-                    showLoading(false)
-                    showError(true)
-                }
+        storyViewModel.stories.observe(this) { pagingData ->
+            storyAdapter.submitData(lifecycle, pagingData)
+        }
+
+        lifecycleScope.launch {
+            storyAdapter.loadStateFlow.collectLatest { loadStates ->
+                binding.loadingContainer.isVisible = loadStates.refresh is LoadState.Loading
+                binding.errorText.isVisible = loadStates.refresh is LoadState.Error
             }
+        }
+
+        storyViewModel.isConnected.observe(this) { isConnected ->
+            binding.errorText.isVisible = !isConnected
+            binding.errorText.text = if (isConnected) "" else getString(R.string.no_internet_connection)
         }
     }
 
+
     private fun observeNetworkStatus() {
-        val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val networkRequest = NetworkRequest.Builder().build()
 
-        val isConnected = connectivityManager.activeNetwork != null
-        storyViewModel.updateConnectionStatus(isConnected)
-
-        connectivityManager.registerNetworkCallback(networkRequest, object : ConnectivityManager.NetworkCallback() {
+        networkCallback = object : ConnectivityManager.NetworkCallback() {
             override fun onAvailable(network: Network) {
                 storyViewModel.updateConnectionStatus(true)
+                storyAdapter.retry()
             }
 
             override fun onLost(network: Network) {
                 storyViewModel.updateConnectionStatus(false)
             }
-        })
+        }
+
+        connectivityManager.registerNetworkCallback(networkRequest, networkCallback)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        connectivityManager.unregisterNetworkCallback(networkCallback)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -132,14 +153,7 @@ class MainActivity : AppCompatActivity() {
         startActivity(intent)
         finish()
     }
-
-    private fun showLoading(isLoading: Boolean) {
-        binding.loadingContainer.visibility = if (isLoading) View.VISIBLE else View.GONE
-    }
-
-    private fun showError(isVisible: Boolean) {
-        binding.errorText.visibility = if (isVisible) View.VISIBLE else View.GONE
-    }
 }
+
 
 
