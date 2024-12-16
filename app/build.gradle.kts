@@ -40,6 +40,9 @@ android {
         viewBinding = true
         buildConfig = true
     }
+    testOptions {
+        animationsDisabled = true
+    }
 }
 
 dependencies {
@@ -66,8 +69,9 @@ dependencies {
     implementation(libs.androidx.paging.runtime.ktx)
     implementation(libs.androidx.room.paging)
     implementation(libs.androidx.room.ktx)
-    ksp(libs.room.compiler)
     testImplementation(libs.junit.junit)
+    testImplementation(libs.junit.junit)
+    ksp(libs.room.compiler)
     testImplementation(libs.junit.junit)
     androidTestImplementation(libs.androidx.core.testing)
     androidTestImplementation(libs.kotlinx.coroutines.test)
@@ -84,4 +88,6 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation (libs.androidx.espresso.intents)
+    androidTestImplementation (libs.androidx.espresso.idling.resource)
 }
