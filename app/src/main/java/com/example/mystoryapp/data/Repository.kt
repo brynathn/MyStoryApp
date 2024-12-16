@@ -69,6 +69,12 @@ class Repository(
         }
     }
 
+    suspend fun getStoryFromDatabase(storyId: String): StoryItem? {
+        return withContext(Dispatchers.IO) {
+            storyDatabase.storyDao().getStoryById(storyId)
+        }
+    }
+
     suspend fun getStoriesWithLocation(token: String): AppResult<List<StoryItem>> {
         return try {
             val response = apiService.getStoriesWithLocation("Bearer $token")

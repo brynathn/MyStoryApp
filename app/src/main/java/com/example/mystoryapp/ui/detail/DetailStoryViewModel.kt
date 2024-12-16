@@ -17,13 +17,20 @@ class DetailStoryViewModel(private val repository: Repository) : ViewModel() {
     fun fetchStoryDetail(storyId: String) {
         viewModelScope.launch {
             _storyDetail.value = AppResult.Loading
-            val token = repository.getUserToken()
-            if (!token.isNullOrEmpty()) {
-                val result = repository.getStoryDetail(token, storyId)
-                _storyDetail.value = result
+
+            val localStory = repository.getStoryFromDatabase(storyId)
+            if (localStory != null) {
+                _storyDetail.value = AppResult.Success(localStory)
             } else {
-                _storyDetail.value = AppResult.Error("Token tidak ditemukan. Silakan login kembali.")
+                val token = repository.getUserToken()
+                if (!token.isNullOrEmpty()) {
+                    val result = repository.getStoryDetail(token, storyId)
+                    _storyDetail.value = result
+                } else {
+                    _storyDetail.value = AppResult.Error("Token tidak ditemukan. Silakan login kembali.")
+                }
             }
         }
     }
+
 }

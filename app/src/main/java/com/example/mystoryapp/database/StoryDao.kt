@@ -16,6 +16,9 @@ interface StoryDao {
     @Query("SELECT COUNT(*) FROM story")
     suspend fun getStoryCount(): Int
 
+    @Query("SELECT * FROM story WHERE id = :storyId")
+    suspend fun getStoryById(storyId: String): StoryItem?
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(stories: List<StoryItem>)
 
