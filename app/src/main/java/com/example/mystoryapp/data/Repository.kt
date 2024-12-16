@@ -6,6 +6,7 @@ import androidx.lifecycle.asLiveData
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
+import androidx.paging.liveData
 import com.example.mystoryapp.R
 import com.example.mystoryapp.UserPreferences
 import com.example.mystoryapp.request.LoginRequest
@@ -72,14 +73,14 @@ class Repository(
         }
     }
 
-    fun getStoriesPagingData(token: String): Flow<PagingData<StoryItem>> {
+    fun getStoriesPagingData(token: String): LiveData<PagingData<StoryItem>> {
         return Pager(
             config = PagingConfig(
                 pageSize = 20,
                 enablePlaceholders = false
             ),
             pagingSourceFactory = { StoryPagingSource(apiService, token) }
-        ).flow
+        ).liveData
     }
 
     suspend fun addStory(

@@ -30,7 +30,6 @@ class StoryViewModel(private val repository: Repository) : ViewModel() {
             emitSource(
                 repository.getStoriesPagingData(token)
                     .cachedIn(viewModelScope)
-                    .asLiveData()
             )
         }
     }

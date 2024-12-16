@@ -63,6 +63,16 @@ dependencies {
     implementation (libs.androidx.datastore.preferences)
     implementation(libs.play.services.maps)
     implementation(libs.androidx.paging.runtime.ktx)
+    testImplementation(libs.junit.junit)
+    testImplementation(libs.junit.junit)
+    androidTestImplementation(libs.androidx.core.testing)
+    androidTestImplementation(libs.kotlinx.coroutines.test)
+
+    testImplementation (libs.byte.buddy)
+    testImplementation(libs.androidx.core.testing)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.mockito.core)
+    testImplementation(libs.mockito.inline)
     ksp(libs.compiler)
     ksp(libs.dagger.compiler)
 

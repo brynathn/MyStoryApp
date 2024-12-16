@@ -151,7 +151,6 @@ class MainActivity : AppCompatActivity() {
     private fun navigateToMaps() {
         val intent = Intent(this, MapsActivity::class.java)
         startActivity(intent)
-        finish()
     }
 }
 
