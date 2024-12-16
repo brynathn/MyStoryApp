@@ -3,6 +3,7 @@ package com.example.mystoryapp.data
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.asLiveData
+import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
@@ -14,10 +15,12 @@ import com.example.mystoryapp.request.SignUpRequest
 import com.example.mystoryapp.retrofit.ApiService
 import kotlinx.coroutines.flow.map
 import com.example.mystoryapp.AppResult
+import com.example.mystoryapp.database.StoryDatabase
 import com.example.mystoryapp.response.StoryItem
-import com.example.mystoryapp.ui.main.StoryPagingSource
-import kotlinx.coroutines.flow.Flow
+import com.example.mystoryapp.ui.main.StoryRemoteMediator
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
@@ -27,11 +30,17 @@ import java.io.File
 class Repository(
     private val apiService: ApiService,
     private val userPreferences: UserPreferences,
-    private val context: Context
+    private val context: Context,
+    private val storyDatabase: StoryDatabase
 ) {
-
     suspend fun getUserToken(): String? {
         return userPreferences.getUserToken().firstOrNull()
+    }
+
+    suspend fun getStoryCount(): Int {
+        return withContext(Dispatchers.IO) {
+            storyDatabase.storyDao().getStoryCount()
+        }
     }
 
     suspend fun getAllStories(token: String): AppResult<List<StoryItem>> {
@@ -74,12 +83,17 @@ class Repository(
     }
 
     fun getStoriesPagingData(token: String): LiveData<PagingData<StoryItem>> {
+        @OptIn(ExperimentalPagingApi::class)
         return Pager(
             config = PagingConfig(
                 pageSize = 20,
                 enablePlaceholders = false
             ),
-            pagingSourceFactory = { StoryPagingSource(apiService, token) }
+            remoteMediator = StoryRemoteMediator(apiService, storyDatabase, token),
+            pagingSourceFactory = {
+//                StoryPagingSource(apiService, token)
+                storyDatabase.storyDao().getStories()
+            }
         ).liveData
     }
 

@@ -12,6 +12,7 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.mystoryapp.R
 import com.example.mystoryapp.databinding.ActivityAddStoryBinding
@@ -21,20 +22,32 @@ import com.example.mystoryapp.di.Injection
 import com.example.mystoryapp.getImageUri
 import com.example.mystoryapp.ui.main.MainActivity
 import com.example.mystoryapp.uriToFile
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 
 class AddStoryActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityAddStoryBinding
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private var currentLat: Float? = null
+    private var currentLon: Float? = null
     private val viewModel: AddStoryViewModel by viewModels {
         AddStoryViewModelFactory(Injection.provideRepository(this), this)
     }
 
     private val requestPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-            if (!isGranted) {
+            if (isGranted) {
+                showToast(getString(R.string.permission_granted))
+                if (binding.switchAddLocation.isChecked) {
+                    requestLocation()
+                }
+            } else {
                 showToast(getString(R.string.permission_denied))
+                binding.switchAddLocation.isChecked = false
             }
         }
+
 
     private val launcherGallery =
         registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri: Uri? ->
@@ -72,6 +85,8 @@ class AddStoryActivity : AppCompatActivity() {
             requestPermissionLauncher.launch(REQUIRED_PERMISSION)
         }
 
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+
         setupListeners()
         observeViewModel()
     }
@@ -85,6 +100,14 @@ class AddStoryActivity : AppCompatActivity() {
             openGallery()
         }
 
+        binding.switchAddLocation.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) {
+                requestLocation()
+            } else {
+                viewModel.clearLocation()
+            }
+        }
+
         binding.buttonAdd.setOnClickListener {
             val description = binding.edAddDescription.text.toString()
             val file = viewModel.selectedFile ?: return@setOnClickListener
@@ -94,12 +117,27 @@ class AddStoryActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
+            if (binding.switchAddLocation.isChecked && (currentLat == null || currentLon == null)) {
+                showToast(getString(R.string.wait_for_location))
+                return@setOnClickListener
+            }
+
             val reducedFile = file.reduceFileImage()
-            viewModel.uploadStory(description, reducedFile)
+            viewModel.uploadStory(description, reducedFile, currentLat, currentLon)
         }
+
     }
 
     private fun observeViewModel() {
+        viewModel.location.observe(this) { location ->
+            if (location != null) {
+                currentLat = location.first
+                currentLon = location.second
+            } else {
+                currentLat = null
+                currentLon = null
+            }
+        }
         viewModel.uploadAppResult.observe(this) { result ->
             when (result) {
                 is AppResult.Loading -> showLoading(true)
@@ -121,7 +159,6 @@ class AddStoryActivity : AppCompatActivity() {
         }
     }
 
-
     private fun startCamera() {
         viewModel.currentImageUri = getImageUri(this)
         launcherIntentCamera.launch(viewModel.currentImageUri!!)
@@ -141,6 +178,31 @@ class AddStoryActivity : AppCompatActivity() {
 
     private fun showToast(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+    }
+
+    private fun requestLocation() {
+        if (ActivityCompat.checkSelfPermission(
+                this, Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+            return
+        }
+
+        fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+            if (location != null) {
+                val lat = location.latitude.toFloat()
+                val lon = location.longitude.toFloat()
+                viewModel.updateLocation(lat, lon)
+                showToast(getString(R.string.location_added))
+            } else {
+                showToast(getString(R.string.location_unavailable))
+                binding.switchAddLocation.isChecked = false
+            }
+        }.addOnFailureListener {
+            showToast(getString(R.string.location_error))
+            binding.switchAddLocation.isChecked = false
+        }
     }
 
     private fun allPermissionsGranted() = ContextCompat.checkSelfPermission(

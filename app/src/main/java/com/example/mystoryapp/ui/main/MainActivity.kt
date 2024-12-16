@@ -74,17 +74,33 @@ class MainActivity : AppCompatActivity() {
 
         lifecycleScope.launch {
             storyAdapter.loadStateFlow.collectLatest { loadStates ->
-                binding.loadingContainer.isVisible = loadStates.refresh is LoadState.Loading
-                binding.errorText.isVisible = loadStates.refresh is LoadState.Error
+                val isLoading = loadStates.refresh is LoadState.Loading
+                val isError = loadStates.refresh is LoadState.Error
+
+                binding.loadingContainer.isVisible = isLoading
+
+                if (isError) {
+                    storyViewModel.isDatabaseEmpty.observe(this@MainActivity) { isEmpty ->
+                        binding.errorText.isVisible = isEmpty
+                        binding.errorText.text = if (isEmpty) getString(R.string.no_internet_connection) else ""
+                    }
+                } else {
+                    binding.errorText.isVisible = false
+                }
             }
         }
 
         storyViewModel.isConnected.observe(this) { isConnected ->
-            binding.errorText.isVisible = !isConnected
-            binding.errorText.text = if (isConnected) "" else getString(R.string.no_internet_connection)
+            if (!isConnected) {
+                storyViewModel.isDatabaseEmpty.observe(this) { isEmpty ->
+                    binding.errorText.isVisible = isEmpty
+                    binding.errorText.text = if (isEmpty) getString(R.string.no_internet_connection) else ""
+                }
+            } else {
+                binding.errorText.isVisible = false
+            }
         }
     }
-
 
     private fun observeNetworkStatus() {
         connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager

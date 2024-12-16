@@ -1,6 +1,7 @@
 package com.example.mystoryapp.ui.add
 
 import android.net.Uri
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -20,6 +21,17 @@ class AddStoryViewModel(private val repository: Repository, private val savedSta
             savedStateHandle["CURRENT_IMAGE_URI"] = value
         }
     var selectedFile: File? = null
+
+    private val _location = MutableLiveData<Pair<Float, Float>?>()
+    val location: LiveData<Pair<Float, Float>?> get() = _location
+
+    fun updateLocation(lat: Float, lon: Float) {
+        _location.value = lat to lon
+    }
+
+    fun clearLocation() {
+        _location.value = null
+    }
 
     fun uploadStory(description: String, imageFile: File, lat: Float? = null, lon: Float? = null) {
         viewModelScope.launch {

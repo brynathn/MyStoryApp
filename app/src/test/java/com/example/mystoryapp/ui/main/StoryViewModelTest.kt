@@ -43,6 +43,7 @@ class StoryViewModelTest {
         val pagingData = QuotePagingSource.snapshot(dummyStoryList)
 
         Mockito.`when`(storyRepository.getUserToken()).thenReturn(token)
+        Mockito.`when`(storyRepository.getStoryCount()).thenReturn(0)
         val expectedLiveData = MutableLiveData<PagingData<StoryItem>>()
         expectedLiveData.value = pagingData
         Mockito.`when`(storyRepository.getStoriesPagingData(token)).thenReturn(expectedLiveData)
@@ -67,6 +68,7 @@ class StoryViewModelTest {
     fun `when Get Story Empty Should Return No Data`() = runTest {
         val token = "mocked_token"
         Mockito.`when`(storyRepository.getUserToken()).thenReturn(token)
+        Mockito.`when`(storyRepository.getStoryCount()).thenReturn(0)
 
         val data: PagingData<StoryItem> = PagingData.from(emptyList())
         val expectedLiveData = MutableLiveData<PagingData<StoryItem>>()
@@ -89,19 +91,19 @@ class StoryViewModelTest {
 
 }
 
-class QuotePagingSource : PagingSource<Int, LiveData<List<StoryItem>>>() {
+class QuotePagingSource : PagingSource<Int, StoryItem>() {
     companion object {
         fun snapshot(items: List<StoryItem>): PagingData<StoryItem> {
             return PagingData.from(items)
         }
     }
 
-    override fun getRefreshKey(state: PagingState<Int, LiveData<List<StoryItem>>>): Int {
-        return 0
+    override fun getRefreshKey(state: PagingState<Int, StoryItem>): Int? {
+        return null
     }
 
-    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, LiveData<List<StoryItem>>> {
-        return LoadResult.Page(emptyList(), 0, 1)
+    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, StoryItem> {
+        return LoadResult.Page(emptyList(), null, null)
     }
 }
 

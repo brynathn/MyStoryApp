@@ -1,25 +1,10 @@
 package com.example.mystoryapp.response
 
-import com.google.gson.annotations.SerializedName
-import androidx.room.Entity
+import android.graphics.Bitmap
 import androidx.room.PrimaryKey
+import com.google.gson.annotations.SerializedName
 
-data class StoryResponse(
-    @SerializedName("error")
-    val error: Boolean,
-
-    @SerializedName("message")
-    val message: String,
-
-    @SerializedName("story")
-    val story: StoryItem? = null,
-
-    @SerializedName("listStory")
-    val listStory: List<StoryItem>? = null
-)
-
-@Entity(tableName = "story")
-data class StoryItem(
+data class WidgetStoryItem(
 
     @PrimaryKey
     @field:SerializedName("id")
@@ -34,6 +19,9 @@ data class StoryItem(
     @field:SerializedName("photoUrl")
     val photoUrl: String,
 
+    @SerializedName("bitmap")
+    val bitmap: Bitmap? = null,
+
     @field:SerializedName("createdAt")
     val createdAt: String,
 
@@ -43,4 +31,3 @@ data class StoryItem(
     @field:SerializedName("lon")
     val lon: Double? = null
 )
-

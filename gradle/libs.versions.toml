@@ -17,6 +17,7 @@ lifecycleLivedataKtx = "2.8.7"
 lifecycleViewmodelKtx = "2.8.7"
 navigationFragmentKtx = "2.8.4"
 okhttp = "4.11.0"
+playServicesLocation = "21.3.0"
 retrofit = "2.9.0"
 glide = "4.16.0"
 devToolsKsp = "2.0.21-1.0.25"
@@ -29,6 +30,9 @@ kotlinxCoroutinesTest = "1.6.1"
 mockitoCore = "4.4.0"
 mockitoInline = "4.4.0"
 junitJunit = "4.12"
+roomPaging = "2.4.0-rc01"
+roomCompiler = "2.5.2"
+roomKtx = "2.5.2"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -36,8 +40,12 @@ androidx-datastore-preferences = { module = "androidx.datastore:datastore-prefer
 androidx-navigation-fragment-ktx = { module = "androidx.navigation:navigation-fragment-ktx", version.ref = "navigationFragmentKtx" }
 androidx-navigation-ui-ktx = { module = "androidx.navigation:navigation-ui-ktx", version.ref = "navigationFragmentKtx" }
 byte-buddy = { module = "net.bytebuddy:byte-buddy", version.ref = "byteBuddy" }
+androidx-room-paging = { module = "androidx.room:room-paging", version.ref = "roomPaging" }
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
 androidx-paging-runtime-ktx = { module = "androidx.paging:paging-runtime-ktx", version.ref = "pagingRuntimeKtx" }
+androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomKtx" }
+play-services-location = { module = "com.google.android.gms:play-services-location", version.ref = "playServicesLocation" }
+room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomCompiler" }
 dagger-compiler = { module = "com.google.dagger:dagger-compiler", version.ref = "daggerCompiler" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 glide = { module = "com.github.bumptech.glide:glide", version.ref = "glide" }

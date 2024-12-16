@@ -60,4 +60,11 @@
     <string name="maps">Maps</string>
     <string name="retry">Retry</string>
     <string name="no_internet_connection">No Internet Connection</string>
+    <string name="add_location">Add Location</string>
+    <string name="add_location_switch">Location Switch</string>
+    <string name="location_added">Location added</string>
+    <string name="location_unavailable">Location unavailable</string>
+    <string name="location_error">Location error</string>
+    <string name="wait_for_location">Wating for location..</string>
+    <string name="permission_granted">Permission granted</string>
 </resources>
