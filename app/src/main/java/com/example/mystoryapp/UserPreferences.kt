@@ -31,18 +31,6 @@ class UserPreferences private constructor(private val dataStore: DataStore<Prefe
         }
     }
 
-    suspend fun saveUserId(userId: String) {
-        dataStore.edit { preferences ->
-            preferences[USER_ID_KEY] = userId
-        }
-    }
-
-    fun getUserId(): Flow<String?> {
-        return dataStore.data.map { preferences ->
-            preferences[USER_ID_KEY]
-        }
-    }
-
     companion object {
         @Volatile
         private var INSTANCE: UserPreferences? = null

@@ -21,7 +21,6 @@ import com.example.mystoryapp.ui.widget.MyStoryWidget
 
 
 class LoginActivity : AppCompatActivity() {
-
     private lateinit var binding: ActivityLoginBinding
     private lateinit var authViewModel: AuthViewModel
 
